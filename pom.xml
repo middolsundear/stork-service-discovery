@@ -6,7 +6,7 @@
     <packaging>pom</packaging>
 
     <artifactId>stork-service-discovery</artifactId>
-    <groupId>io.smallrye.stork</groupId>
+    <groupId>com.middol.stork</groupId>
     <version>1.0.0</version>
     <name>SmallRye Stork Service Discovery</name>
 
