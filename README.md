@@ -1,7 +1,7 @@
 # stork-service-discovery
 SmallRye Stork's discovery extension.
 
-![](https://img.shields.io/badge/mavencenter-1.0.0-green)
+![](https://img.shields.io/badge/maven--central-1.0.0-green)
 
 ## Quick start
 - 1、Introduce maven coordinates
