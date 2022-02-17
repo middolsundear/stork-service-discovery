@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 /**
  * @author <a href="https://github.com/y-bowen">bowen yang</a>
  * @version 1.0
- * @date 2022年02月16日 11:13 上午
  */
 public class NacosServiceDiscovery extends CachingServiceDiscovery {
     private final String serviceName;

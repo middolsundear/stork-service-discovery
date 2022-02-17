@@ -10,7 +10,6 @@ import io.smallrye.stork.spi.StorkInfrastructure;
 /**
  * @author <a href="https://github.com/y-bowen">bowen yang</a>
  * @version 1.0
- * @date 2022年02月16日 11:15 上午
  */
 @ServiceDiscoveryType("nacos")
 @ServiceDiscoveryAttribute(name = "nacos-serve-addr", description = "The Nacos server host.", required = true, defaultValue = "http://127.0.0.1:8848")
