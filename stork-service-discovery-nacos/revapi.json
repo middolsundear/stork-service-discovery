@@ -33,27 +33,27 @@
         {
           "ignore": true,
           "code": "java.method.numberOfParametersChanged",
-          "old": "method void io.smallrye.stork.servicediscovery.nacos.NacosServiceDiscovery::<init>(io.smallrye.stork.config.ServiceDiscoveryConfig, java.lang.String, boolean)",
-          "new": "method void io.smallrye.stork.servicediscovery.nacos.NacosServiceDiscovery::<init>(io.smallrye.stork.config.ServiceDiscoveryConfig, java.lang.String, boolean, io.smallrye.stork.integration.StorkInfrastructure)",
+          "old": "method void io.github.middolsundear.stork.servicediscovery.nacos.NacosServiceDiscovery::<init>(io.smallrye.stork.config.ServiceDiscoveryConfig, java.lang.String, boolean)",
+          "new": "method void io.github.middolsundear.stork.servicediscovery.nacos.NacosServiceDiscovery::<init>(io.smallrye.stork.config.ServiceDiscoveryConfig, java.lang.String, boolean, io.smallrye.stork.integration.StorkInfrastructure)",
           "justification": "Integrate Infrastructure support (new feature)"
         },
         {
           "ignore": true,
           "code": "java.method.removed",
-          "old": "method boolean io.smallrye.stork.CachingServiceDiscovery::refreshNotNeed() @ io.smallrye.stork.servicediscovery.nacos.NacosServiceDiscovery",
+          "old": "method boolean io.smallrye.stork.CachingServiceDiscovery::refreshNotNeed() @ io.github.middolsundear.stork.servicediscovery.nacos.NacosServiceDiscovery",
           "justification": "Removed unused method"
         },
         {
           "ignore": true,
           "code": "java.method.numberOfParametersChanged",
-          "old": "method io.smallrye.stork.ServiceDiscovery io.smallrye.stork.servicediscovery.nacos.NacosServiceDiscoveryProvider::createServiceDiscovery(io.smallrye.stork.config.ServiceDiscoveryConfig, java.lang.String, io.smallrye.stork.config.ServiceConfig)",
-          "new": "method io.smallrye.stork.ServiceDiscovery io.smallrye.stork.servicediscovery.nacos.NacosServiceDiscoveryProvider::createServiceDiscovery(io.smallrye.stork.config.ServiceDiscoveryConfig, java.lang.String, io.smallrye.stork.config.ServiceConfig, io.smallrye.stork.integration.StorkInfrastructure)",
+          "old": "method io.smallrye.stork.ServiceDiscovery io.github.middolsundear.stork.servicediscovery.nacos.NacosServiceDiscoveryProvider::createServiceDiscovery(io.smallrye.stork.config.ServiceDiscoveryConfig, java.lang.String, io.smallrye.stork.config.ServiceConfig)",
+          "new": "method io.smallrye.stork.ServiceDiscovery io.github.middolsundear.stork.servicediscovery.nacos.NacosServiceDiscoveryProvider::createServiceDiscovery(io.smallrye.stork.config.ServiceDiscoveryConfig, java.lang.String, io.smallrye.stork.config.ServiceConfig, io.smallrye.stork.integration.StorkInfrastructure)",
           "justification": "Integrate Infrastructure support (new feature)"
         },
         {
           "ignore": true,
           "code": "java.class.removed",
-          "old": "class io.smallrye.stork.servicediscovery.nacos.StorkConfigHelper",
+          "old": "class io.github.middolsundear.stork.servicediscovery.nacos.StorkConfigHelper",
           "justification": "Removed unused class"
         }
       ]
