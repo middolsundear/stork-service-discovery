@@ -7,7 +7,7 @@ SmallRye Stork's discovery extension.
 - 1、Introduce maven coordinates
 ```
    <dependency>
-     <groupId>com.middol.stork</groupId>
+     <groupId>io.github.middolsundear.stork</groupId>
      <artifactId>stork-service-discovery-nacos</artifactId>
      <version>1.0.0</version>
    </dependency>

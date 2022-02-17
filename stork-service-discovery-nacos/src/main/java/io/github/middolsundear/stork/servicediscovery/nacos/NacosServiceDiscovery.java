@@ -1,4 +1,4 @@
-package io.smallrye.stork.servicediscovery.nacos;
+package io.github.middolsundear.stork.servicediscovery.nacos;
 
 import com.alibaba.nacos.api.PropertyKeyConst;
 import com.alibaba.nacos.api.exception.NacosException;

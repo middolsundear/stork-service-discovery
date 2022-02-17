@@ -1,4 +1,4 @@
-package io.smallrye.stork.servicediscovery.nacos;
+package io.github.middolsundear.stork.servicediscovery.nacos;
 
 import io.smallrye.stork.api.ServiceDiscovery;
 import io.smallrye.stork.spi.ServiceDiscoveryProvider;
