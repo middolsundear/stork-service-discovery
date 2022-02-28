@@ -82,7 +82,7 @@ public class RedService {
 }
 
 ```
--3、Create the src/main/java/org/acme/services/Registration.java file with the following content:
+- 3、Create the src/main/java/org/acme/services/Registration.java file with the following content:
 ```
 package org.acme.services;
 
@@ -150,7 +150,7 @@ public class Registration {
     }
 }
 ```
--4、Create the src/main/java/org/acme/MyService.java file with the following content:
+- 4、Create the src/main/java/org/acme/MyService.java file with the following content:
 ```
 package org.acme;
 
@@ -175,7 +175,7 @@ public interface MyService {
     String get();
 }
 ```
--5、Create the src/main/java/org/acme/FrontendApi.java file with the following content:
+- 5、Create the src/main/java/org/acme/FrontendApi.java file with the following content:
 ```
 package org.acme;
 
