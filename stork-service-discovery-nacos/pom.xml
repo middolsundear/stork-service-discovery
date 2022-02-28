@@ -19,9 +19,9 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.alibaba.nacos</groupId>
-            <artifactId>nacos-client</artifactId>
-            <version>1.4.3</version>
+            <groupId>io.vertx</groupId>
+            <artifactId>vertx-web-client</artifactId>
+            <version>4.2.5</version>
         </dependency>
         <dependency>
             <groupId>io.smallrye.stork</groupId>
@@ -67,7 +67,6 @@
             <artifactId>awaitility</artifactId>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
 </project>

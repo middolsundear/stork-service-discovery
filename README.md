@@ -91,42 +91,65 @@ public class RedService {
 ```
 package org.acme.services;
 
-import com.alibaba.nacos.api.PropertyKeyConst;
-import com.alibaba.nacos.api.exception.NacosException;
-import com.alibaba.nacos.api.naming.NamingFactory;
-import com.alibaba.nacos.api.naming.NamingService;
 import io.quarkus.runtime.StartupEvent;
+import io.vertx.ext.web.client.WebClient;
 import io.vertx.mutiny.core.Vertx;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
-import java.util.Properties;
+import java.net.URI;
+import java.util.concurrent.atomic.AtomicReference;
+
 
 @ApplicationScoped
 public class Registration {
 
+    Logger logger = LoggerFactory.getLogger(this.getClass());
     @ConfigProperty(name = "nacos.serve.addr") String serveAddr;
 
-    @ConfigProperty(name = "blue-service-port", defaultValue = "9000") int red;
-    @ConfigProperty(name = "red-service-port", defaultValue = "9001") int blue;
+    @ConfigProperty(name = "blue-service-port", defaultValue = "9000") Integer red;
+    @ConfigProperty(name = "red-service-port", defaultValue = "9001") Integer blue;
+
     /**
-     * Register our two services in nacos.
+     * Register our two services in Consul.
      *
      * Note: this method is called on a worker thread, and so it is allowed to block.
      */
-    public void init(@Observes StartupEvent ev, Vertx vertx) {
-        Properties properties = new Properties();
-        properties.setProperty(PropertyKeyConst.SERVER_ADDR,serveAddr);
-        properties.setProperty(PropertyKeyConst.USERNAME,"nacos");
-        properties.setProperty(PropertyKeyConst.PASSWORD,"nacos");
-        try {
-            NamingService naming = NamingFactory.createNamingService(properties);
-            naming.registerInstance("my-service","127.0.0.1",blue);
-            naming.registerInstance("my-service","127.0.0.1",red);
-        } catch (NacosException e) {
-            e.printStackTrace();
-        }
+    public void init(@Observes StartupEvent ev, Vertx vertx) throws ClassNotFoundException {
+        final URI uri = URI.create(serveAddr);
+        final WebClient client = WebClient.create(vertx.getDelegate());
+        AtomicReference<String> accessToken = new AtomicReference<>("");
+        client.post(uri.getPort(), uri.getHost(), "/nacos/v1/auth/login")
+                .addQueryParam("username", "nacos")
+                .addQueryParam("password", "nacos").send()
+                .onSuccess(bufferHttpResponse ->{
+                    accessToken.set(bufferHttpResponse.bodyAsJsonObject().getString("accessToken"));
+                })
+                .onFailure(throwable ->
+                        logger.error(throwable.getStackTrace().toString())
+                );
+        client.post(uri.getPort(), uri.getHost(), "/nacos/v1/ns/instance")
+                .addQueryParam("ip","127.0.0.1")
+                .addQueryParam("port", red.toString())
+                .addQueryParam("serviceName","my-service")
+                .send()
+                .onSuccess(bufferHttpResponse -> {
+
+                }).onFailure(throwable -> {
+
+        });
+        client.post(uri.getPort(), uri.getHost(), "/nacos/v1/ns/instance")
+                .addQueryParam("ip","127.0.0.1")
+                .addQueryParam("port", blue.toString())
+                .addQueryParam("serviceName","my-service")
+                .send()
+                .onSuccess(bufferHttpResponse -> {
+
+                }).onFailure(throwable -> {
+
+        });
     }
 }
 ```

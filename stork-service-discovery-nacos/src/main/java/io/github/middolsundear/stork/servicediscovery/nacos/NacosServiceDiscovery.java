@@ -1,29 +1,30 @@
 package io.github.middolsundear.stork.servicediscovery.nacos;
 
-import com.alibaba.nacos.api.PropertyKeyConst;
-import com.alibaba.nacos.api.exception.NacosException;
-import com.alibaba.nacos.api.naming.NamingFactory;
-import com.alibaba.nacos.api.naming.NamingService;
-import com.alibaba.nacos.api.naming.pojo.Instance;
 import io.smallrye.mutiny.Uni;
 import io.smallrye.stork.api.ServiceInstance;
 import io.smallrye.stork.impl.CachingServiceDiscovery;
 import io.smallrye.stork.impl.DefaultServiceInstance;
-import io.smallrye.stork.spi.StorkInfrastructure;
+import io.vertx.core.Vertx;
+import io.vertx.core.json.JsonObject;
+import io.vertx.ext.web.client.WebClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
-import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author <a href="https://github.com/y-bowen">bowen yang</a>
  * @version 1.0
  */
 public class NacosServiceDiscovery extends CachingServiceDiscovery {
+    private Logger logger = LoggerFactory.getLogger(this.getClass());
     private final String serviceName;
     private final boolean secure;
     private final String serveAddr;
@@ -31,8 +32,10 @@ public class NacosServiceDiscovery extends CachingServiceDiscovery {
     private final String password;
     private final String groupName;
     private final String namespaceId;
-    private final boolean healthyOnly;
-    public NacosServiceDiscovery(NacosServiceDiscoveryProviderConfiguration config, String serviceName, boolean secure) {
+    private final Boolean healthyOnly;
+    private final WebClient webClient;
+    private final URI server;
+    public NacosServiceDiscovery(NacosServiceDiscoveryProviderConfiguration config, String serviceName, boolean secure, Vertx vertx) {
         super(config.getRefreshPeriod());
         this.serveAddr = config.getNacosServeAddr();
         this.serviceName = serviceName;
@@ -42,34 +45,53 @@ public class NacosServiceDiscovery extends CachingServiceDiscovery {
         this.groupName = config.getNacosGroupName();
         this.namespaceId = config.getNacosNamespaceId();
         this.healthyOnly = Boolean.valueOf(config.getHealthyOnly());
+        this.webClient = WebClient.create(vertx);
+        this.server = URI.create(this.serveAddr);
+
     }
 
     @Override
     public Uni<List<ServiceInstance>> fetchNewServiceInstances(List<ServiceInstance> list) {
-        Uni<List<Instance>> emitter = Uni.createFrom().emitter(uniEmitter -> {
-            try {
-                Properties properties = new Properties();
-                properties.setProperty(PropertyKeyConst.SERVER_ADDR,serveAddr);
-                properties.setProperty(PropertyKeyConst.USERNAME,userName);
-                properties.setProperty(PropertyKeyConst.PASSWORD,password);
-                properties.setProperty(PropertyKeyConst.NAMESPACE,namespaceId);
-                NamingService naming = NamingFactory.createNamingService(properties);
-                List<Instance> instances = naming.selectInstances(serviceName, groupName, healthyOnly);
-                uniEmitter.complete(instances);
-            } catch (NacosException e) {
-                uniEmitter.fail(e);
-            }
+
+        AtomicReference<String> accessToken = new AtomicReference<>("");
+        webClient.post(server.getPort(), server.getHost(), "/nacos/v1/auth/login")
+                .addQueryParam("username", this.userName)
+                .addQueryParam("password", this.password).send()
+                .onSuccess(bufferHttpResponse ->
+                        accessToken.set(bufferHttpResponse.bodyAsJsonObject().getString("accessToken"))
+                )
+                .onFailure(throwable ->
+                        logger.error(throwable.getStackTrace().toString())
+                );
+
+        return Uni.createFrom().emitter(uniEmitter -> {
+            this.webClient.get(server.getPort(),server.getHost(),"/nacos/v1/ns/instance/list")
+                    .addQueryParam("serviceName",this.serviceName)
+                    .addQueryParam("groupName",this.groupName)
+                    .addQueryParam("namespaceId",this.namespaceId)
+                    .addQueryParam("healthyOnly",this.healthyOnly.toString())
+                    .addQueryParam("accessToken",accessToken.get())
+                    .send().onSuccess(bufferHttpResponse -> {
+                        List<ServiceInstance> serviceInstances = new ArrayList<>();
+                        try {
+                            for (Object host : bufferHttpResponse.bodyAsJsonObject().getJsonArray("hosts")) {
+                                JsonObject instance = (JsonObject) host;
+                                MessageDigest md5 = null;
+                                md5 = MessageDigest.getInstance("MD5");
+                                md5.update(instance.getString("instanceId").getBytes(StandardCharsets.UTF_8));
+                                BigInteger instanceId = new BigInteger(1, md5.digest());
+                                serviceInstances.add(new DefaultServiceInstance(instanceId.longValue(),
+                                        instance.getString("ip"),
+                                        instance.getInteger("port"),
+                                        secure));
+                            }
+                            uniEmitter.complete(serviceInstances);
+                        }catch (NoSuchAlgorithmException e){
+                            uniEmitter.fail(e);
+                        }
+                    }).onFailure(throwable -> {
+                        uniEmitter.fail(throwable);
+                    });
         });
-        return emitter.map(instances -> instances.stream().map(instance -> {
-            try {
-                MessageDigest md5 = MessageDigest.getInstance("MD5");
-                md5.update(instance.getInstanceId().getBytes(StandardCharsets.UTF_8));
-                BigInteger instanceId = new BigInteger(1, md5.digest());
-                return new DefaultServiceInstance(instanceId.longValue(),instance.getIp(),instance.getPort(),secure);
-            } catch (NoSuchAlgorithmException e) {
-                e.printStackTrace();
-                return null;
-            }
-        }).filter(instance -> null!=instance).collect(Collectors.toList()));
     }
 }
