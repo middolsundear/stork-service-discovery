@@ -11,11 +11,6 @@ SmallRye Stork's discovery extension.
      <artifactId>stork-service-discovery-nacos</artifactId>
      <version>1.0.0</version>
    </dependency>
-   <dependency>
-      <groupId>com.alibaba.nacos</groupId>
-      <artifactId>nacos-client</artifactId>
-      <version>1.4.3</version>
-    </dependency>
 ```
 - 2、Add the following configuration in the application.properties file
 ```
