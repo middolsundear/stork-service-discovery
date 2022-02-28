@@ -129,6 +129,7 @@ public class Registration {
                 .addQueryParam("ip","127.0.0.1")
                 .addQueryParam("port", red.toString())
                 .addQueryParam("serviceName","my-service")
+                .addQueryParam("accessToken",accessToken.get())
                 .send()
                 .onSuccess(bufferHttpResponse -> {
 
@@ -139,6 +140,7 @@ public class Registration {
                 .addQueryParam("ip","127.0.0.1")
                 .addQueryParam("port", blue.toString())
                 .addQueryParam("serviceName","my-service")
+                .addQueryParam("accessToken",accessToken.get())
                 .send()
                 .onSuccess(bufferHttpResponse -> {
 
